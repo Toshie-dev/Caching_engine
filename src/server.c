@@ -5,31 +5,32 @@
 #include <stdbool.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include"./protocol/protocol.c"
 
-static void do_something(int connfd) {
-    char rbuf[64] = {};
-    
-    // read() returns 0 on EOF (client closed connection), or negative on error
-    ssize_t n = read(connfd, rbuf, sizeof(rbuf) - 1);
-    if (n < 0) {
-        perror("read() error");
-        return;
-    }
-    if (n == 0) {
-        printf("Client disconnected without sending data.\n");
-        return;
-    }
-
-    // Ensure it's null-terminated before printing safety
-    rbuf[n] = '\0';
-    printf("client says: %s\n", rbuf);
-
-    char wbuf[] = "world\n";
-    ssize_t bytes_written = write(connfd, wbuf, strlen(wbuf));
-    if (bytes_written < 0) {
-        perror("write() error");
-    }
-}
+// static void do_something(int connfd) {
+//     char rbuf[64] = {};
+//     
+//     // read() returns 0 on EOF (client closed connection), or negative on error
+//     ssize_t n = read(connfd, rbuf, sizeof(rbuf) - 1);
+//     if (n < 0) {
+//         perror("read() error");
+//         return;
+//     }
+//     if (n == 0) {
+//         printf("Client disconnected without sending data.\n");
+//         return;
+//     }
+// 
+//     // Ensure it's null-terminated before printing safety
+//     rbuf[n] = '\0';
+//     printf("client says: %s\n", rbuf);
+// 
+//     char wbuf[] = "world\n";
+//     ssize_t bytes_written = write(connfd, wbuf, strlen(wbuf));
+//     if (bytes_written < 0) {
+//         perror("write() error");
+//     }
+// }
 
 int main() {
     // Create socket
@@ -82,8 +83,13 @@ int main() {
             perror("accept() error");
             continue;   // Skip this iteration and try again
         }
-
-        do_something(connfd);
+        // only serves one client connection at once
+        while (true) {
+            int32_t err = one_request(connfd);
+            if (err) {
+                break;
+            }
+        }
         close(connfd); // Clean up connection socket
     }
 
