@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include"./protocol/protocol.c"
+#include "concurrency/event_loop.h"
 
 // static void do_something(int connfd) {
 //     char rbuf[64] = {};
@@ -32,7 +33,8 @@
 //     }
 // }
 
-int main() {
+int start_listening_sock()
+{
     // Create socket
     int fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd < 0) {
@@ -72,27 +74,37 @@ int main() {
 
     printf("Server listening on port 1234...\n");
 
-    // Event Loop
-    while (true) {
-        struct sockaddr_in client_addr = {};
-        socklen_t addrlen = sizeof(client_addr);
-        
-        // connection socket
-        int connfd = accept(fd, (struct sockaddr *)&client_addr, &addrlen);
-        if (connfd < 0) {
-            perror("accept() error");
-            continue;   // Skip this iteration and try again
-        }
-        // only serves one client connection at once
-        while (true) {
-            int32_t err = one_request(connfd);
-            if (err) {
-                break;
-            }
-        }
-        close(connfd); // Clean up connection socket
-    }
+    return fd;
+}
 
-    close(fd); // Unreachable here, but good practice
+
+int main() {
+    
+    int lst_sock = start_listening_sock();
+    
+    start_event_loop(lst_sock);
+
+    // Event Loop
+   // while (true) {
+   //     struct sockaddr_in client_addr = {};
+   //     socklen_t addrlen = sizeof(client_addr);
+   //     
+   //     // connection socket
+   //     int connfd = accept(fd, (struct sockaddr *)&client_addr, &addrlen);
+   //     if (connfd < 0) {
+   //         perror("accept() error");
+   //         continue;   // Skip this iteration and try again
+   //     }
+   //     // only serves one client connection at once
+   //     while (true) {
+   //         int32_t err = one_request(connfd);
+   //         if (err) {
+   //             break;
+   //         }
+   //     }
+   //     close(connfd); // Clean up connection socket
+   // }
+
+    close(lst_sock); // Unreachable here, but good practice
     return 0;
 }

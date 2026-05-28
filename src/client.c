@@ -92,7 +92,7 @@ int main() {
         goto L_DONE;
     }
 
-L_DONE:
+    L_DONE:
     close(fd);
     return 0;
 }
