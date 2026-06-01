@@ -81,16 +81,16 @@ int main() {
     }
 
     // Send first query
-    int32_t err = query(fd, "hello1");
+    int32_t err = query(fd, "set 10");
     if (err) {
         goto L_DONE;
     }
 
-    // Send second query over the same connection
-    err = query(fd, "hello2");
-    if (err) {
-        goto L_DONE;
-    }
+   // Send second query over the same connection
+   err = query(fd, "get 10");
+   if (err) {
+       goto L_DONE;
+   }
 
     L_DONE:
     close(fd);

@@ -1,3 +1,5 @@
+#include "../protocol/protocol.h"
+#include<iostream>
 // Handlers for reading and writing to kernel stack and processing single requests as intitiated by the global event loop
 
 const size_t k_max_msg_2 = 4096;
@@ -29,13 +31,23 @@ static bool try_one_request(Conn *conn) {
         return false;   // want read
     }
     const uint8_t *request = &conn->incoming[4];
+    
     // 4. Process the parsed message.
-    // ...
+    std::vector<std::string> cmd;
+    if (parse_req(request, (size_t)len, cmd) < 0) {
+        conn->want_close = true;
+        return false;   // error
+    }
+
+    Response resp;
+    do_request(cmd, resp);
+    // make_response(resp, conn->outgoing);
+    // std::cout<<cmd<<std::endl;
     // generate the response (echo)
-    buf_append(conn->outgoing, (const uint8_t *)&len, 4);
-    buf_append(conn->outgoing, request, len);
-    // 5. Remove the message from `Conn::incoming`.
-    buf_consume(conn->incoming, 4 + len);
+   // buf_append(conn->outgoing, (const uint8_t *)&len, 4);
+   // buf_append(conn->outgoing, request, len);
+   // // 5. Remove the message from `Conn::incoming`.
+   // buf_consume(conn->incoming, 4 + len);
     return true;        // success
 }
 

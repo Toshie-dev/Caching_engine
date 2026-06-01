@@ -13,6 +13,7 @@
 #include <cstring>
 #include <cassert>
 #include "event_loop.h"
+#include "../protocol/protocol.h"
 #include "./handlers.c"
 
 std::vector<Conn*> fd2conn;
