@@ -11,7 +11,7 @@
 #include <map>
 #include <string>
 #include "./protocol.h"
-
+#include "../data_structures/hashtable.h"
 
 bool read_u32(const uint8_t *&cur, const uint8_t *end, uint32_t &out) {
     if (cur + 4 > end) {
@@ -23,24 +23,24 @@ bool read_u32(const uint8_t *&cur, const uint8_t *end, uint32_t &out) {
 }
 
 // placeholder; implemented later
-static std::map<std::string, std::string> g_data;
+// static std::map<std::string, std::string> g_data;
 
 void do_request(std::vector<std::string> &cmd, Response &out) {
-    if (cmd.size() == 2 && cmd[0] == "get") {
-        auto it = g_data.find(cmd[1]);
-        if (it == g_data.end()) {
-            out.status = RES_NX;    // not found
-            return;
-        }
-        const std::string &val = it->second;
-        out.data.assign(val.begin(), val.end());
-    } else if (cmd.size() == 3 && cmd[0] == "set") {
-        g_data[cmd[1]].swap(cmd[2]);
-    } else if (cmd.size() == 2 && cmd[0] == "del") {
-        g_data.erase(cmd[1]);
-    } else {
-        out.status = RES_ERR;       // unrecognized command
-    }
+//    if (cmd.size() == 2 && cmd[0] == "get") {
+//        auto it = g_data.find(cmd[1]);
+//        if (it == g_data.end()) {
+//            out.status = RES_NX;    // not found
+//            return;
+//        }
+//        const std::string &val = it->second;
+//        out.data.assign(val.begin(), val.end());
+//    } else if (cmd.size() == 3 && cmd[0] == "set") {
+//        g_data[cmd[1]].swap(cmd[2]);
+//    } else if (cmd.size() == 2 && cmd[0] == "del") {
+//        g_data.erase(cmd[1]);
+//    } else {
+//        out.status = RES_ERR;       // unrecognized command
+//    }
 }
 
 bool read_str(const uint8_t *&cur, const uint8_t *end, size_t n, std::string &out) {

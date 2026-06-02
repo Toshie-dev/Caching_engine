@@ -1,5 +1,11 @@
 #include "../protocol/protocol.h"
 #include<iostream>
+#include <cstring>
+#include <cassert>
+#include "event_loop.h"
+#include <sys/socket.h>
+#include <unistd.h>
+
 // Handlers for reading and writing to kernel stack and processing single requests as intitiated by the global event loop
 
 const size_t k_max_msg_2 = 4096;
